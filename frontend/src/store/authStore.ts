@@ -19,8 +19,14 @@ export const useAuthStore = create<AuthState>()(
     (set) => ({
       user: null,
       isAuthenticated: false,
-      login: (user) => set({ user, isAuthenticated: true }),
-      logout: () => set({ user: null, isAuthenticated: false }),
+      login: (user) => {
+        set({ user, isAuthenticated: true });
+      },
+      logout: () => {
+        set({ user: null, isAuthenticated: false });
+        // Clear cart from localStorage when logging out
+        localStorage.removeItem('flipkart-cart');
+      },
     }),
     { name: 'flipkart-auth' }
   )
