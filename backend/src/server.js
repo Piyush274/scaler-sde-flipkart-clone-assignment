@@ -14,7 +14,6 @@ import dbConnect from "./db/dbConnect.js";
 
 const app = express()
 const port = process.env.PORT || 5000
-const frontendOrigin = process.env.FRONTEND_ORIGIN || "http://localhost:8080";
 
 const _dirname = path.resolve(); //We will get direct path of folder
 
@@ -31,7 +30,7 @@ app.use(express.urlencoded({extended:true}))
 app.use(cookieParser());
 app.use(
   cors({
-    origin: frontendOrigin,
+    origin: true,
     credentials: true,
   })
 );
