@@ -9,7 +9,9 @@ const Header = () => {
   const [searchQuery, setSearchQuery] = useState('');
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const navigate = useNavigate();
-  const getTotalItems = useCartStore((s) => s.getTotalItems);
+  const totalCartItems = useCartStore((s) =>
+    s.items.reduce((sum, item) => sum + item.quantity, 0)
+  );
   const wishlistItems = useWishlistStore((s) => s.items);
   const { user, isAuthenticated, logout } = useAuthStore();
 
@@ -100,9 +102,9 @@ const Header = () => {
             className="relative flex items-center gap-1 rounded px-2 py-1.5 text-sm font-medium text-primary-foreground hover:bg-primary-foreground/10 md:px-3"
           >
             <ShoppingCart size={18} />
-            {getTotalItems() > 0 && (
+            {totalCartItems > 0 && (
               <span className="absolute -right-1 -top-1 flex h-4 w-4 items-center justify-center rounded-full bg-accent text-[10px] font-bold text-accent-foreground">
-                {getTotalItems()}
+                {totalCartItems}
               </span>
             )}
             <span className="hidden md:inline">Cart</span>
