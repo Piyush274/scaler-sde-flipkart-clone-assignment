@@ -65,7 +65,7 @@ const Header = () => {
                 className="hidden items-center gap-1 rounded px-3 py-1.5 text-sm font-medium text-primary-foreground hover:bg-primary-foreground/10 md:flex"
               >
                 <Package size={18} />
-                <span>Orders</span>
+                <span>Order History</span>
               </Link>
               <button
                 onClick={handleLogout}
@@ -125,7 +125,7 @@ const Header = () => {
             {isAuthenticated ? (
               <>
                 <span className="text-sm font-medium text-primary-foreground">Hi, {user?.name}</span>
-                <Link to="/orders" onClick={() => setMobileMenuOpen(false)} className="text-sm text-primary-foreground/80 hover:text-primary-foreground">My Orders</Link>
+                <Link to="/orders" onClick={() => setMobileMenuOpen(false)} className="text-sm text-primary-foreground/80 hover:text-primary-foreground">My Order History</Link>
                 <button onClick={() => { handleLogout(); setMobileMenuOpen(false); }} className="text-left text-sm text-primary-foreground/80 hover:text-primary-foreground">Logout</button>
               </>
             ) : (

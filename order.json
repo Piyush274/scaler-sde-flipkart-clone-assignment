@@ -1,0 +1,71 @@
+{
+  "_id": {
+    "$oid": "69de830f285eb41db02312e8"
+  },
+  "user": {
+    "$oid": "69de5edd920ca421b7de05a4"
+  },
+  "totalPrice": 74999,
+  "status": "pending",
+  "createdAt": {
+    "$date": "2026-04-14T18:10:23.738Z"
+  },
+  "updatedAt": {
+    "$date": "2026-04-14T18:10:23.738Z"
+  },
+  "__v": 0
+}
+
+{
+  "_id": {
+    "$oid": "69df4f237d45dc88fbb882bb"
+  },
+  "user": {
+    "$oid": "69de5edd920ca421b7de05a4"
+  },
+  "totalPrice": 599,
+  "status": "pending",
+  "createdAt": {
+    "$date": "2026-04-15T08:41:07.201Z"
+  },
+  "updatedAt": {
+    "$date": "2026-04-15T08:41:07.201Z"
+  },
+  "__v": 0
+}
+
+{
+  "_id": {
+    "$oid": "69dfb7b2c2df9055e8c84649"
+  },
+  "user": {
+    "$oid": "69de5edd920ca421b7de05a4"
+  },
+  "totalPrice": 3891,
+  "status": "pending",
+  "createdAt": {
+    "$date": "2026-04-15T16:07:14.270Z"
+  },
+  "updatedAt": {
+    "$date": "2026-04-15T16:07:14.270Z"
+  },
+  "__v": 0
+}
+
+{
+  "_id": {
+    "$oid": "69e0644f2037fddc8137648d"
+  },
+  "user": {
+    "$oid": "69de5edd920ca421b7de05a4"
+  },
+  "totalPrice": 139697,
+  "status": "pending",
+  "createdAt": {
+    "$date": "2026-04-16T04:23:43.648Z"
+  },
+  "updatedAt": {
+    "$date": "2026-04-16T04:23:43.648Z"
+  },
+  "__v": 0
+}

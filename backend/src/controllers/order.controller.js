@@ -2,6 +2,7 @@ import Cart from "../models/cart.model.js";
 import CartItem from "../models/cartItem.model.js";
 import Order from "../models/order.model.js";
 import OrderItem from "../models/orderItem.model.js";
+import ProductImage from "../models/productImage.model.js";
 
 export const placeOrder = async (req, res, next) => {
   try {
@@ -81,6 +82,60 @@ export const getOrderById = async (req, res, next) => {
       .lean();
 
     res.status(200).json({ ...order, items });
+  } catch (error) {
+    next(error);
+  }
+};
+
+export const getOrders = async (req, res, next) => {
+  try {
+    const orders = await Order.find({ user: req.user._id })
+      .sort({ createdAt: -1 })
+      .lean();
+
+    const orderIds = orders.map((order) => order._id);
+    const items = await OrderItem.find({ order: { $in: orderIds } })
+      .populate("product", "title category")
+      .lean();
+
+    const productIds = items
+      .map((item) => item.product?._id)
+      .filter((id) => id != null);
+
+    const images = await ProductImage.find({ product: { $in: productIds } }).lean();
+    const imageMap = new Map();
+    images.forEach((image) => {
+      const key = image.product.toString();
+      if (!imageMap.has(key)) {
+        imageMap.set(key, []);
+      }
+      imageMap.get(key).push(image.imageUrl);
+    });
+
+    const itemsByOrder = new Map();
+    items.forEach((item) => {
+      const orderId = item.order.toString();
+      if (!itemsByOrder.has(orderId)) {
+        itemsByOrder.set(orderId, []);
+      }
+      const productId = item.product?._id?.toString();
+      itemsByOrder.get(orderId).push({
+        _id: item._id,
+        product: {
+          ...item.product,
+          images: productId ? imageMap.get(productId) || [] : [],
+        },
+        quantity: item.quantity,
+        price: item.price,
+      });
+    });
+
+    const response = orders.map((order) => ({
+      ...order,
+      items: itemsByOrder.get(order._id.toString()) || [],
+    }));
+
+    res.status(200).json({ orders: response });
   } catch (error) {
     next(error);
   }

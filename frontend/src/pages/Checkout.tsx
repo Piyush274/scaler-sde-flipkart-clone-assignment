@@ -1,8 +1,9 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Check } from 'lucide-react';
 import { useCartStore } from '@/store/cartStore';
 import { useOrderStore } from '@/store/orderStore';
+import { useAuthStore } from '@/store/authStore';
 import PriceSummary from '@/components/PriceSummary';
 import { toast } from '@/hooks/use-toast';
 import { fetchOrderByIdApi, placeOrderApi } from '@/services/api';
@@ -10,10 +11,23 @@ import { fetchOrderByIdApi, placeOrderApi } from '@/services/api';
 const Checkout = () => {
   const navigate = useNavigate();
   const { items, clearCart, getSubtotal } = useCartStore();
+  const user = useAuthStore((s) => s.user);
   const [step, setStep] = useState(1);
   const [address, setAddress] = useState({
-    name: '', phone: '', pincode: '', locality: '', address: '', city: '', state: '',
+    name: user?.name ?? '',
+    phone: '9876543210',
+    pincode: '560001',
+    locality: 'MG Road',
+    address: '123 Sample Street, Sample Area',
+    city: 'Bengaluru',
+    state: 'Karnataka',
   });
+
+  useEffect(() => {
+    if (user?.name) {
+      setAddress((prev) => ({ ...prev, name: user.name }));
+    }
+  }, [user?.name]);
 
   if (items.length === 0) {
     navigate('/cart');

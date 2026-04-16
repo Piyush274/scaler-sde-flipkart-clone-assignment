@@ -1,17 +1,61 @@
+import { useEffect, useState } from 'react';
 import { Package } from 'lucide-react';
 import { Link } from 'react-router-dom';
-import { useOrderStore } from '@/store/orderStore';
+import { fetchOrdersApi } from '@/services/api';
+import { type Order } from '@/store/orderStore';
 
 const Orders = () => {
-  const orders = useOrderStore((s) => s.orders);
+  const [orders, setOrders] = useState<Order[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState('');
+
+  useEffect(() => {
+    const loadOrders = async () => {
+      try {
+        const data = await fetchOrdersApi();
+        setOrders(data.orders.map((order) => ({
+          id: order._id,
+          date: order.createdAt,
+          total: order.totalPrice,
+          status: order.status,
+          address: order.address || '',
+          items: order.items.map((item) => ({
+            id: item._id,
+            title: item.product.title,
+            price: item.price,
+            quantity: item.quantity,
+            image:
+              item.product.images?.length
+                ? item.product.images[0]
+                : 'https://images.unsplash.com/photo-1523275335684-37898b6baf30?w=400',
+          })),
+        })));
+      } catch {
+        setError('Unable to load order history.');
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    loadOrders();
+  }, []);
+
+  if (loading) {
+    return (
+      <div className="flex flex-col items-center justify-center py-20 text-center">
+        <Package size={64} className="mb-4 text-muted-foreground/40" />
+        <h2 className="text-lg font-medium text-foreground">Loading order history...</h2>
+      </div>
+    );
+  }
 
   if (orders.length === 0) {
     return (
       <div className="flex flex-col items-center justify-center py-20 text-center">
         <Package size={64} className="mb-4 text-muted-foreground/40" />
-        <h2 className="text-lg font-medium text-foreground">No orders yet</h2>
+        <h2 className="text-lg font-medium text-foreground">No order history yet</h2>
         <p className="mt-1 text-sm text-muted-foreground">
-          Place your first order and it will appear here
+          Place your first order and it will appear here.
         </p>
         <Link
           to="/"
@@ -25,7 +69,7 @@ const Orders = () => {
 
   return (
     <div className="container mx-auto px-4 py-6">
-      <h1 className="mb-6 text-lg font-bold text-foreground">My Orders</h1>
+      <h1 className="mb-6 text-lg font-bold text-foreground">Order History</h1>
 
       <div className="space-y-4">
         {orders.map((order) => (

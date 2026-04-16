@@ -45,6 +45,7 @@ interface BackendCartItem {
     price: number;
     category: string;
     stock: number;
+    images?: string[];
   };
   quantity: number;
 }
@@ -62,6 +63,7 @@ interface BackendOrderItem {
     _id: string;
     title: string;
     category: string;
+    images?: string[];
   };
   quantity: number;
   price: number;
@@ -73,6 +75,10 @@ export interface BackendOrder {
   status: string;
   createdAt: string;
   items: BackendOrderItem[];
+}
+
+interface BackendOrdersResponse {
+  orders: BackendOrder[];
 }
 
 const toProduct = (product: BackendProduct): Product => {
@@ -163,5 +169,10 @@ export const placeOrderApi = async () => {
 
 export const fetchOrderByIdApi = async (orderId: string) => {
   const { data } = await api.get<BackendOrder>(`/orders/${orderId}`);
+  return data;
+};
+
+export const fetchOrdersApi = async () => {
+  const { data } = await api.get<BackendOrdersResponse>("/orders");
   return data;
 };

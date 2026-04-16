@@ -38,7 +38,9 @@ const mapCartResponse = (payload: BackendCartResponse): CartItem[] =>
     price: item.product.price,
     originalPrice: Math.round(item.product.price * 1.15),
     image:
-      'https://images.unsplash.com/photo-1523275335684-37898b6baf30?w=400',
+      item.product.images?.length
+        ? item.product.images[0]
+        : 'https://images.unsplash.com/photo-1523275335684-37898b6baf30?w=400',
     quantity: item.quantity,
   }));
 

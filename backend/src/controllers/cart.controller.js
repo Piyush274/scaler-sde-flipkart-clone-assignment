@@ -1,6 +1,7 @@
 import Cart from "../models/cart.model.js";
 import CartItem from "../models/cartItem.model.js";
 import Product from "../models/product.model.js";
+import ProductImage from "../models/productImage.model.js";
 
 const getOrCreateCart = async (userId) => {
   let cart = await Cart.findOne({ user: userId });
@@ -15,12 +16,37 @@ const buildCartResponse = async (cartId) => {
     .populate("product", "title price category stock")
     .lean();
 
-  const subtotal = items.reduce(
+  const productIds = items
+    .map((item) => item.product?._id)
+    .filter((id) => id != null);
+
+  const productImages = await ProductImage.find({
+    product: { $in: productIds },
+  }).lean();
+
+  const imageMap = new Map();
+  productImages.forEach((image) => {
+    const key = image.product.toString();
+    if (!imageMap.has(key)) {
+      imageMap.set(key, []);
+    }
+    imageMap.get(key).push(image.imageUrl);
+  });
+
+  const normalizedItems = items.map((item) => ({
+    ...item,
+    product: {
+      ...item.product,
+      images: imageMap.get(item.product?._id?.toString()) || [],
+    },
+  }));
+
+  const subtotal = normalizedItems.reduce(
     (sum, item) => sum + (item.product?.price || 0) * item.quantity,
     0
   );
 
-  return { items, subtotal, totalPrice: subtotal };
+  return { items: normalizedItems, subtotal, totalPrice: subtotal };
 };
 
 export const getCart = async (req, res, next) => {
