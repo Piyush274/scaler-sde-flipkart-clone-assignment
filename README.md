@@ -1,46 +1,111 @@
-# Frontend <-> Backend Connection Reference
+# Flipkart Clone - Final Project README
 
-This file is the practical guide for connecting `frontend` to `backend` in this project.
+A full-stack Flipkart-inspired e-commerce project with a React + TypeScript frontend and an Express + MongoDB backend.
 
+The application supports product discovery, cart operations, checkout flow, and order placement, with backend APIs and frontend state management wired for local development.
 
-For architecture and flow details, also see:
-- `CODEBASE_FLOW_SUMMARY.md`
+## Project Structure
 
-## Current State (Important)
-- Backend has real APIs under `/api/*` with MongoDB persistence.
-- Frontend is still using mock product data from `frontend/src/services/api.ts`.
-- Frontend auth/cart/order behavior is local store based, not fully backend-driven yet.
+```text
+scaler-sde-flipkart-clone/
+├── frontend/               # React + Vite + TypeScript app
+│   ├── src/
+│   │   ├── components/     # UI and reusable components
+│   │   ├── pages/          # Route-level pages
+│   │   ├── services/       # Axios clients and API layer
+│   │   ├── store/          # Zustand stores
+│   │   └── hooks/          # Reusable hooks
+├── backend/                # Express API server
+│   ├── src/
+│   │   ├── controllers/    # API handlers
+│   │   ├── routes/         # Route definitions
+│   │   ├── models/         # Mongoose models
+│   │   ├── middlewares/    # Auth, validation, error handlers
+│   │   ├── db/             # Database connection
+│   │   └── seed/           # Seed script
+└── FINAL_README.md
+```
 
-## 1) Start Both Apps
+## Tech Stack
+
+### Frontend
+- React 18
+- TypeScript
+- Vite
+- Tailwind CSS
+- React Router
+- TanStack Query
+- Zustand
+- Axios
 
 ### Backend
-1. Open terminal in `backend`
-2. Install deps:
-   - `npm install`
-3. Create/update `backend/.env`:
+- Node.js
+- Express
+- MongoDB + Mongoose
+- Cookie Parser
+- CORS
+- JSON Web Token (JWT)
+
+## Core Features
+
+- Product listing with search and category filtering
+- Product detail view
+- Cart management (add, update quantity, remove)
+- Checkout and order placement
+- Protected APIs using cookie-based auth (with `x-user-id` fallback for testing)
+- Flipkart-style responsive UI layout
+
+## API Endpoints
+
+Base URL (local): `http://localhost:5050`
+
+### Products
+- `GET /api/products`
+- `GET /api/products/:id`
+
+### Cart (Protected)
+- `GET /api/cart`
+- `POST /api/cart`
+- `PUT /api/cart/:id`
+- `DELETE /api/cart/:id`
+
+### Orders (Protected)
+- `POST /api/orders`
+- `GET /api/orders/:id`
+
+### Auth
+- `GET /api/auth/test-login` (development test login; sets JWT cookie)
+
+## Local Setup
+
+## 1) Clone and install dependencies
+
+Install backend dependencies:
+
+```bash
+cd backend
+npm install
+```
+
+Install frontend dependencies:
+
+```bash
+cd ../frontend
+npm install
+```
+
+## 2) Configure environment variables
+
+Create `backend/.env`:
 
 ```env
 PORT=5000
 MONGODB_URI=your_mongodb_connection_string
-JWT_SECRET=replace_with_strong_secret
+JWT_SECRET=replace_with_a_strong_secret
 TEST_USER_EMAIL=test@example.com
 TEST_USER_NAME=Test User
 NODE_ENV=development
 ```
-
-4. Run backend:
-   - `npm run dev`
-
-### Frontend
-1. Open terminal in `frontend`
-2. Install deps:
-   - `npm install`
-3. Run frontend:
-   - `npm run dev`
-
-By default, frontend runs on `http://localhost:8080` and backend on `http://localhost:5000`.
-
-## 2) Add Frontend API Base URL
 
 Create `frontend/.env`:
 
@@ -48,85 +113,98 @@ Create `frontend/.env`:
 VITE_API_BASE_URL=http://localhost:5000/api
 ```
 
-Use it from frontend code:
-- `const baseURL = import.meta.env.VITE_API_BASE_URL`
+## 3) Run the application
 
-## 3) Recommended API Client Pattern (Frontend)
+Start backend:
 
-Create a single API client (example `frontend/src/services/http.ts`):
-
-```ts
-import axios from "axios";
-
-export const api = axios.create({
-  baseURL: import.meta.env.VITE_API_BASE_URL,
-  withCredentials: true,
-});
+```bash
+cd backend
+npm run dev
 ```
 
-Why `withCredentials: true`?
-- Backend can set/read JWT cookie (`jwt`) for auth flow.
+Start frontend (new terminal):
 
-## 4) Replace Mock Product API With Backend Calls
+```bash
+cd frontend
+npm run dev
+```
 
-Current file:
-- `frontend/src/services/api.ts` (mock in-memory dataset)
+Typical local URLs:
+- Frontend: `http://localhost:8080` (or the Vite URL shown in terminal)
+- Backend: `http://localhost:5000`
 
-Target behavior:
-- `GET /api/products` for listing
-- `GET /api/products/:id` for product details
+## Useful Scripts
 
-Suggested migration:
-1. Keep product TypeScript interfaces.
-2. Replace local `PRODUCTS` and delays with API calls.
-3. Map backend response shape to frontend product shape if fields differ.
-4. Keep hooks (`useProducts`, `useProduct`) and only swap service implementation.
+### Backend (`backend/package.json`)
+- `npm run dev` - start server with nodemon
+- `npm start` - start server with node
+- `npm run seed` - seed sample data
 
-## 5) Protected Routes and Authentication
+### Frontend (`frontend/package.json`)
+- `npm run dev` - start Vite dev server
+- `npm run build` - production build
+- `npm run preview` - preview built app
+- `npm run lint` - run ESLint
+- `npm run test` - run Vitest tests once
+- `npm run test:watch` - run Vitest in watch mode
 
-Backend support:
-- `GET /api/auth/test-login` issues JWT cookie and returns test user.
-- Protected APIs use `protectRoute` middleware.
+## Frontend-Backend Integration Notes
 
-Frontend integration plan:
-1. On login page, call `/api/auth/test-login` (temporary development login).
-2. Save user in `authStore`.
-3. Keep `isAuthenticated` based on user/session checks.
-4. Call protected APIs with cookie enabled (`withCredentials: true`).
+- The frontend Axios client uses `withCredentials: true`, so cookie auth works across requests.
+- The backend enables CORS with credentials.
+- For protected endpoints, prefer auth cookie flow via `/api/auth/test-login`.
+- Temporary fallback: pass `x-user-id` header for testing protected APIs if needed.
 
-Fallback option:
-- Backend currently also accepts `x-user-id` header when cookie is absent.
-- Use this only for temporary testing.
+## Quick Testing Flow
 
-## 6) Cart/Order/Wishlist Integration Path
+1. Start backend and frontend.
+2. Hit `GET /api/auth/test-login` once to create/login test user.
+3. Call `GET /api/products`.
+4. Add an item using `POST /api/cart`.
+5. Verify cart with `GET /api/cart`.
+6. Place order using `POST /api/orders`.
+7. Fetch order details with `GET /api/orders/:id`.
 
-Recommended order:
-1. Products: swap `fetchProducts` and `fetchProductById`
-2. Cart: wire `/api/cart` endpoints
-3. Orders: wire `/api/orders` endpoints
-4. Wishlist: either
-   - keep frontend-only store, or
-   - add backend wishlist endpoints and sync state
+You can use the included Postman collection file at root:
+- `Flipkart-Clone-API.postman_collection.json`
 
-## 7) CORS Note (Only If Needed)
+Published Postman documentation:
+- [Flipkart Clone API](https://documenter.getpostman.com/view/37576231/2sBXqCQjCC)
 
-If frontend and backend run on different origins and cookies are blocked, add CORS in backend with credentials:
-- `origin: "http://localhost:8080"`
-- `credentials: true`
+## Deployment (Suggested)
 
-Currently, this backend does not explicitly configure CORS in `src/server.js`.
+### Frontend
+- Vercel or Netlify
+- Set `VITE_API_BASE_URL` to deployed backend `/api` URL
 
-## 8) Quick Verification Checklist
-- Backend starts and connects to MongoDB successfully.
-- Frontend can fetch products from `/api/products`.
-- Login calls `/api/auth/test-login` and user state updates.
-- Protected request (`/api/cart`) works after login.
-- Order creation works via `/api/orders`.
+### Backend
+- Render / Railway / AWS
+- Provide environment variables from `backend/.env`
+- Ensure MongoDB network access and credentials are configured
 
-## 9) Troubleshooting
-- `401 Unauthorized`:
-  - cookie not present, or invalid token, or missing `x-user-id`
-- `400 Invalid id`:
-  - malformed Mongo ObjectId in route params
-- Empty product/cart/order responses:
-  - seed or insert test data in DB (`npm run seed` in backend)
+### Production Serving
+- Backend is configured to serve `frontend/dist` for non-API routes after frontend build is generated.
+
+## Known Limitations
+
+- No full signup/login/logout user journey yet (currently test-login based for development flow).
+- Some frontend features may still use local state/store behaviors while integration is being completed.
+- Seed data and realistic catalog quality can be expanded further.
+
+## Assumptions Made
+
+- Node.js 18+ and npm are installed on your machine.
+- A valid MongoDB instance is available and reachable via `MONGODB_URI`.
+- Frontend and backend run locally with frontend calling backend on `http://localhost:5000/api`.
+- Cookie-based auth is used for protected APIs, with `/api/auth/test-login` used as the current development login flow.
+- If cookie auth is unavailable during testing, `x-user-id` may be used temporarily for protected endpoints.
+- Backend serves `frontend/dist` in production after frontend build artifacts are generated.
+
+## Future Improvements
+
+- Full authentication and role-based authorization
+- Wishlist backend sync
+- Order history page from backend APIs
+- Better filtering/sorting/pagination at API level
+- CI/CD and end-to-end test coverage
+
