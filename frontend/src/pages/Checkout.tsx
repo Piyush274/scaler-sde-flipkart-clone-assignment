@@ -44,8 +44,10 @@ const Checkout = () => {
   };
 
   const addOrder = useOrderStore((s) => s.addOrder);
+  const [isPlacingOrder, setIsPlacingOrder] = useState(false);
 
   const handlePlaceOrder = async () => {
+    setIsPlacingOrder(true);
     try {
       const placed = await placeOrderApi();
       const order = await fetchOrderByIdApi(placed.orderId);
@@ -57,7 +59,10 @@ const Checkout = () => {
           id: i._id,
           title: i.product.title,
           price: i.price,
-          image: 'https://images.unsplash.com/photo-1523275335684-37898b6baf30?w=400',
+          image:
+            i.product.images?.length
+              ? i.product.images[0]
+              : 'https://images.unsplash.com/photo-1523275335684-37898b6baf30?w=400',
           quantity: i.quantity,
         })),
         total: order.totalPrice,
@@ -66,9 +71,16 @@ const Checkout = () => {
       });
 
       clearCart();
+      toast({ title: 'Order placed successfully!', description: `Order ID: ${placed.orderId}` });
       navigate('/order-success', { state: { orderId: placed.orderId } });
-    } catch {
-      toast({ title: 'Failed to place order', variant: 'destructive' });
+    } catch (error: any) {
+      toast({
+        title: 'Failed to place order',
+        description: error?.response?.data?.error || 'Please try again later.',
+        variant: 'destructive',
+      });
+    } finally {
+      setIsPlacingOrder(false);
     }
   };
 
@@ -192,9 +204,10 @@ const Checkout = () => {
             </div>
             <button
               onClick={handlePlaceOrder}
-              className="mt-6 w-full rounded-sm bg-flipkart-orange py-3.5 text-sm font-bold uppercase text-card shadow hover:brightness-95"
+              disabled={isPlacingOrder}
+              className="mt-6 w-full rounded-sm bg-flipkart-orange py-3.5 text-sm font-bold uppercase text-card shadow transition hover:brightness-95 disabled:cursor-not-allowed disabled:opacity-60"
             >
-              Continue
+              {isPlacingOrder ? 'Placing Order...' : 'Continue'}
             </button>
           </div>
         )}

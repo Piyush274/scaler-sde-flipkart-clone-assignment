@@ -65,7 +65,7 @@ const AppRoutes = () => {
           <Route path="/auth" element={<Auth />} />
           <Route path="/cart" element={<ProtectedRoute><Cart /></ProtectedRoute>} />
           <Route path="/checkout" element={<ProtectedRoute><Checkout /></ProtectedRoute>} />
-          <Route path="/order-success" element={<ProtectedRoute><OrderSuccess /></ProtectedRoute>} />
+          <Route path="/order-success" element={<OrderSuccess />} />
           <Route path="/wishlist" element={<ProtectedRoute><Wishlist /></ProtectedRoute>} />
           <Route path="/orders" element={<ProtectedRoute><Orders /></ProtectedRoute>} />
         </Route>

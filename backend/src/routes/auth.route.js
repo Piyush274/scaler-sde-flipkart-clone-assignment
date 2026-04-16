@@ -6,8 +6,8 @@ const router = express.Router();
 
 router.get("/test-login", async (_, res, next) => {
   try {
-    const testEmail = process.env.TEST_USER_EMAIL || "customer1@chatalaxy.com";
-    const testName = process.env.TEST_USER_NAME || "Customer One";
+    const testEmail = process.env.TEST_USER_EMAIL || "ScalerAI@gmail.com";
+    const testName = process.env.TEST_USER_NAME || "Scaler AI";
 
     let user = await User.findOne({ email: testEmail });
     if (!user) {
