@@ -39,6 +39,12 @@ app.use("/api/products", productRoute);
 app.use("/api/cart", cartRoute);
 app.use("/api/orders", orderRoute);
 app.use("/api/auth", authRoute);
+app.get("/api/health", (_, res) => {
+  res.json({
+    status: "ok",
+    note: "Render free instances may spin down after 15 minutes of inactivity, so the first request can be slow.",
+  });
+});
 
 app.use(express.static(path.join(_dirname, "/frontend/dist")));
 
